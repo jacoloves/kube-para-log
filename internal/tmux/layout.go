@@ -7,6 +7,7 @@ import (
 )
 
 var PaneColors = []string{
+	"fg=colour15",
 	"fg=colour196",
 	"fg=colour208",
 	"fg=colour226",
@@ -14,7 +15,6 @@ var PaneColors = []string{
 	"fg=colour51",
 	"fg=colour27",
 	"fg=colour129",
-	"fg=colour15",
 }
 
 func StartTmuxWithLogs(sessionName string, podNames []string) error {
