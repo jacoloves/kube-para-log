@@ -12,7 +12,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var namespace string
+var (
+	container string
+	namespace string
+	since     string
+	tail      int
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -35,8 +40,19 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
+		// container flag check
+		if container == "" {
+			containerName, err := kubectl.GuessBestContainerName(pods[0], namespace)
+			if err != nil {
+				fmt.Println("❎ Could not guess container name:", err)
+				os.Exit(1)
+			}
+			fmt.Printf("🔍 Using auto-selected container: %s\n", err)
+			container = containerName
+		}
+
 		fmt.Println("✅ Stating tmux session with logs...")
-		err = tmux.StartTmuxWithLogs("kube-para-log", pods, namespace)
+		err = tmux.StartTmuxWithLogs("kube-para-log", pods, namespace, since, tail, container)
 		if err != nil {
 			fmt.Println("❎ tmux error:", err)
 			os.Exit(1)
@@ -64,4 +80,7 @@ func init() {
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	rootCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Kubernetes maespace to search pods in")
+	rootCmd.Flags().StringVar(&since, "since", "", "Only return logs newer than a relatice duration like 5s, 2m, or 3h")
+	rootCmd.Flags().IntVar(&tail, "tail", 10, "Lines of recent log file to display (0 = all)")
+	rootCmd.Flags().StringVarP(&container, "container", "c", "", "Target container name (for multi-container pods)")
 }
