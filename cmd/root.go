@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jacoloves/kube-para-log/internal/kubectl"
 	"github.com/spf13/cobra"
 )
 
@@ -14,14 +15,27 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "kube-para-log [keyword]",
 	Short: "Kubernetes pod los in parallel tmux panes",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1), // Specify only one argument.
 	Run: func(cmd *cobra.Command, args []string) {
 		keyword := args[0]
 		fmt.Printf("👓 Searching for pods containing keyword: '%s'\n", keyword)
 
 		// internal/kubectl package function
-		// pods := kubectl.FindMathingPods(keyword)
-		// fmt.Println("Matched pods:", pods)
+		pods, err := kubectl.FindMatchingPods(keyword)
+		if err != nil {
+			fmt.Println("❎ Error:", err)
+			os.Exit(1)
+		}
+
+		if len(pods) == 0 {
+			fmt.Println("🚧 No mathing pods found.")
+			return
+		}
+
+		fmt.Println("✅ Mathed pods:")
+		for _, pod := range pods {
+			fmt.Println(" -", pod)
+		}
 	},
 }
 
