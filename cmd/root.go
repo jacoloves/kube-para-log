@@ -1,30 +1,28 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 )
 
-
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "kube-para-log",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Use:   "kube-para-log [keyword]",
+	Short: "Kubernetes pod los in parallel tmux panes",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		keyword := args[0]
+		fmt.Printf("👓 Searching for pods containing keyword: '%s'\n", keyword)
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+		// internal/kubectl package function
+		// pods := kubectl.FindMathingPods(keyword)
+		// fmt.Println("Matched pods:", pods)
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -47,5 +45,3 @@ func init() {
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
-
-
