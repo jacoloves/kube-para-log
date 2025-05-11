@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/jacoloves/kube-para-log/internal/kubectl"
+	"github.com/jacoloves/kube-para-log/internal/tmux"
 	"github.com/spf13/cobra"
 )
 
@@ -32,9 +33,11 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Println("✅ Mathed pods:")
-		for _, pod := range pods {
-			fmt.Println(" -", pod)
+		fmt.Println("✅ Stating tmux session with logs...")
+		err = tmux.StartTmuxWithLogs("kube-para-log", pods)
+		if err != nil {
+			fmt.Println("❎ tmux error:", err)
+			os.Exit(1)
 		}
 	},
 }
