@@ -41,6 +41,9 @@ func StartTmuxWithLogs(sessionName string, podNames []string) error {
 			exec.Command("tmux", "select-layout", "-t", target, "tiled").Run()
 		}
 
+		// setting pane name to pod name
+		exec.Command("tmux", "select-pane", "-t", target, "-T", pod).Run()
+
 		cmd := fmt.Sprintf("kubectl logs -f %s", pod)
 		if err := exec.Command("tmux", "send-keys", "-t", target, cmd, "C-m").Run(); err != nil {
 			return fmt.Errorf("failed to send command to tmux: %w", err)
