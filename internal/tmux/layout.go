@@ -6,6 +6,17 @@ import (
 	"os/exec"
 )
 
+var PaneColors = []string{
+	"fg=colour196",
+	"fg=colour208",
+	"fg=colour226",
+	"fg=colour46",
+	"fg=colour51",
+	"fg=colour27",
+	"fg=colour129",
+	"fg=colour15",
+}
+
 func StartTmuxWithLogs(sessionName string, podNames []string) error {
 	if len(podNames) == 0 {
 		return fmt.Errorf("no pods to display logs for")
@@ -43,6 +54,10 @@ func StartTmuxWithLogs(sessionName string, podNames []string) error {
 
 		// setting pane name to pod name
 		exec.Command("tmux", "select-pane", "-t", target, "-T", pod).Run()
+
+		// setting pane color
+		color := PaneColors[i%len(PaneColors)]
+		exec.Command("tmux", "select-pane", "-t", target, "-P", color).Run()
 
 		cmd := fmt.Sprintf("kubectl logs -f %s", pod)
 		if err := exec.Command("tmux", "send-keys", "-t", target, cmd, "C-m").Run(); err != nil {
