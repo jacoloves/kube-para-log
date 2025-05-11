@@ -16,8 +16,8 @@ type PodList struct {
 }
 
 // FindMatchingPods runs `kubectl get pods -o json` and returns pod names containing the keyword
-func FindMatchingPods(keyword string) ([]string, error) {
-	cmd := exec.Command("kubectl", "get", "pods", "-o", "json")
+func FindMatchingPods(keyword string, namespace string) ([]string, error) {
+	cmd := exec.Command("kubectl", "get", "pods", "-n", namespace, "-o", "json")
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("failed to run kubectl: %w", err)
