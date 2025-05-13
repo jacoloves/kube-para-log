@@ -17,7 +17,7 @@ var PaneColors = []string{
 	"fg=colour129",
 }
 
-func StartTmuxWithLogs(sessionName string, podNames []string, namespace string, since string, tail int) error {
+func StartTmuxWithLogs(sessionName string, podNames []string, namespace string, since string, tail int, container string) error {
 	if len(podNames) == 0 {
 		return fmt.Errorf("no pods to display logs for")
 	}
@@ -60,6 +60,9 @@ func StartTmuxWithLogs(sessionName string, podNames []string, namespace string, 
 		exec.Command("tmux", "select-pane", "-t", target, "-P", color).Run()
 
 		cmd := fmt.Sprintf("kubectl logs -f %s -n %s", pod, namespace)
+		if container != "" {
+			cmd += fmt.Sprintf(" --container=%s", container)
+		}
 		if since != "" {
 			cmd += fmt.Sprintf(" --since=%s", since)
 		}

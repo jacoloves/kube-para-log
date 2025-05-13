@@ -13,6 +13,7 @@ import (
 )
 
 var (
+	container string
 	namespace string
 	since     string
 	tail      int
@@ -40,7 +41,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		fmt.Println("✅ Stating tmux session with logs...")
-		err = tmux.StartTmuxWithLogs("kube-para-log", pods, namespace, since, tail)
+		err = tmux.StartTmuxWithLogs("kube-para-log", pods, namespace, since, tail, container)
 		if err != nil {
 			fmt.Println("❎ tmux error:", err)
 			os.Exit(1)
@@ -70,4 +71,5 @@ func init() {
 	rootCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Kubernetes maespace to search pods in")
 	rootCmd.Flags().StringVar(&since, "since", "", "Only return logs newer than a relatice duration like 5s, 2m, or 3h")
 	rootCmd.Flags().IntVar(&tail, "tail", 10, "Lines of recent log file to display (0 = all)")
+	rootCmd.Flags().StringVarP(&container, "container", "c", "", "Target container name (for multi-container pods)")
 }
