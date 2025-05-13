@@ -40,6 +40,17 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
+		// container flag check
+		if container == "" {
+			containerName, err := kubectl.GuessBestContainerName(pods[0], namespace)
+			if err != nil {
+				fmt.Println("❎ Could not guess container name:", err)
+				os.Exit(1)
+			}
+			fmt.Printf("🔍 Using auto-selected container: %s\n", err)
+			container = containerName
+		}
+
 		fmt.Println("✅ Stating tmux session with logs...")
 		err = tmux.StartTmuxWithLogs("kube-para-log", pods, namespace, since, tail, container)
 		if err != nil {

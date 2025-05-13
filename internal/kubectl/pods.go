@@ -38,3 +38,44 @@ func FindMatchingPods(keyword string, namespace string) ([]string, error) {
 
 	return matched, nil
 }
+
+func GuessBestContainerName(pod string, namesapce string) (string, error) {
+	cmd := exec.Command("kubectl", "get", "pod", pod, "-n", namesapce, "-o", "json")
+	out, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("failed to get pod json: %w", err)
+	}
+
+	var result struct {
+		Status struct {
+			ContainerStatuses []struct {
+				Name string `json:"name"`
+			} `json:"containerStatuses"`
+		} `json:"status"`
+	}
+
+	if err := json.Unmarshal(out, &result); err != nil {
+		return "", fmt.Errorf("failed to parse pod json: %w", err)
+	}
+
+	for _, cs := range result.Status.ContainerStatuses {
+		if isSidecarContainer(cs.Name) {
+			return cs.Name, nil
+		}
+	}
+
+	return "", fmt.Errorf("no non-sidecar container found")
+}
+
+func isSidecarContainer(name string) bool {
+	sidecars := []string{
+		"envoy", "fluentd", "datadog",
+	}
+	for _, sc := range sidecars {
+		if strings.Contains(name, sc) {
+			return true
+		}
+	}
+
+	return false
+}
