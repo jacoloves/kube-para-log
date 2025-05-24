@@ -71,4 +71,4 @@ set-option -g pane-border-format "#{pane_index} #[bold]#{pane_title}"
 ```
 
 ## License
-MIT
+Licensed under the MIT License. See [LICENSE](LICENSE) for more details.
